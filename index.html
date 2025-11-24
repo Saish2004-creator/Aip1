@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siemens Standard Block Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4da6ff;
+            --secondary: #b3e0ff;
+            --background: #e6f5ff;
+            --dark-blue: #0077cc;
+            --light-blue: #f0f9ff;
+            --text-dark: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: rgba(77, 166, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Login Page */
+        #login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .login-card {
+            background-color: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 15px 30px var(--shadow);
+            z-index: 2;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(77, 166, 255, 0.2);
+            outline: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, var(--primary), var(--dark-blue));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Dashboard */
+        #dashboard {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--dark-blue));
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--white);
+            box-shadow: 4px 0 12px var(--shadow);
+            padding: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar li i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .sidebar li:hover {
+            background-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .sidebar li.active {
+            background-color: var(--primary);
+            color: white;
+            border-right: 4px solid var(--dark-blue);
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 30px;
+            background-color: var(--light-blue);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--secondary);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .card-description {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            flex: 1;
+        }
+
+        .download-btn {
+            padding: 12px 20px;
+            background: linear-gradient(to right, var(--primary), var(--dark-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .download-btn i {
+            margin-right: 8px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px var(--shadow);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--white);
+            padding: 20px;
+            text-align: center;
+            color: var(--text-light);
+            box-shadow: 0 -4px 12px var(--shadow);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 70px;
+                left: -250px;
+                height: calc(100vh - 70px);
+                z-index: 99;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                position: relative;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page">
+        <div class="particles" id="particles"></div>
+        <div class="login-card">
+            <h2>Siemens Standard Block Library</h2>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password">
+            </div>
+            <button class="login-btn" id="login-btn">Login</button>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">Siemens Standard Block Library</div>
+            <button class="menu-toggle" id="menu-toggle">☰</button>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <nav class="sidebar" id="sidebar">
+                <ul>
+                    <li class="active" data-page="dashboard-page"><i>📊</i> Dashboard</li>
+                    <li data-page="standard-blocks-page"><i>🧩</i> Standard Blocks</li>
+                    <li data-page="function-blocks-page"><i>⚙️</i> Function Blocks (FB)</li>
+                    <li data-page="function-page"><i>🔧</i> Function (FC)</li>
+                    <li data-page="data-blocks-page"><i>🗃️</i> Data Blocks (DB)</li>
+                    <li data-page="scl-templates-page"><i>📝</i> SCL Templates</li>
+                    <li data-page="about-page"><i>ℹ️</i> About</li>
+                </ul>
+            </nav>
+
+            <!-- Content Area -->
+            <div class="content">
+                <!-- Dashboard Page -->
+                <div class="page active" id="dashboard-page">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p>Welcome to the Siemens Standard Block Library. Here you can find and download various standardized blocks for TIA Portal.</p>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🧩</div>
+                                <div class="card-title">Standard Blocks</div>
+                            </div>
+                            <p class="card-description">Access our collection of standardized function blocks for common industrial applications.</p>
+                            <button class="download-btn" data-page="standard-blocks-page"><i>📥</i> Browse Blocks</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">⚙️</div>
+                                <div class="card-title">Function Blocks</div>
+                            </div>
+                            <p class="card-description">Specialized function blocks for complex control tasks and automation processes.</p>
+                            <button class="download-btn" data-page="function-blocks-page"><i>📥</i> Browse FBs</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🔧</div>
+                                <div class="card-title">Functions</div>
+                            </div>
+                            <p class="card-description">Reusable functions for common calculations, conversions, and data processing tasks.</p>
+                            <button class="download-btn" data-page="function-page"><i>📥</i> Browse FCs</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Standard Blocks Page -->
+                <div class="page" id="standard-blocks-page">
+                    <h1 class="page-title">Standard Blocks</h1>
+                    <p>Download standardized Siemens blocks for TIA Portal applications.</p>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🚚</div>
+                                <div class="card-title">FB_TransporterStd</div>
+                            </div>
+                            <p class="card-description">Standard function block for controlling transport systems with integrated diagnostics.</p>
+                            <button class="download-btn" data-file="FB_TransporterStd.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">⚡</div>
+                                <div class="card-title">FB_MotorStd</div>
+                            </div>
+                            <p class="card-description">Standard motor control block with start/stop, direction control, and fault handling.</p>
+                            <button class="download-btn" data-file="FB_MotorStd.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🚪</div>
+                                <div class="card-title">FB_SafetyDoor</div>
+                            </div>
+                            <p class="card-description">Safety door monitoring function block with dual-channel evaluation.</p>
+                            <button class="download-btn" data-file="FB_SafetyDoor.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">📦</div>
+                                <div class="card-title">FB_ConveyorStd</div>
+                            </div>
+                            <p class="card-description">Standard conveyor control with speed regulation and product tracking.</p>
+                            <button class="download-btn" data-file="FB_ConveyorStd.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">📊</div>
+                                <div class="card-title">FB_AnalogScaling</div>
+                            </div>
+                            <p class="card-description">Analog signal scaling and conditioning with limit monitoring.</p>
+                            <button class="download-btn" data-file="FB_AnalogScaling.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">⏱️</div>
+                                <div class="card-title">FC_TimerOnOff</div>
+                            </div>
+                            <p class="card-description">On/Off delay timer function with reset capability and status feedback.</p>
+                            <button class="download-btn" data-file="FC_TimerOnOff.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Function Blocks Page -->
+                <div class="page" id="function-blocks-page">
+                    <h1 class="page-title">Function Blocks (FB)</h1>
+                    <p>Specialized function blocks for complex control tasks.</p>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🔄</div>
+                                <div class="card-title">FB_AxisRef</div>
+                            </div>
+                            <p class="card-description">Axis referencing function block for precise positioning systems.</p>
+                            <button class="download-btn" data-file="FB_AxisRef.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">📈</div>
+                                <div class="card-title">FB_PIDControl</div>
+                            </div>
+                            <p class="card-description">Advanced PID controller with auto-tuning and manual mode.</p>
+                            <button class="download-btn" data-file="FB_PIDControl.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Function Page -->
+                <div class="page" id="function-page">
+                    <h1 class="page-title">Functions (FC)</h1>
+                    <p>Reusable functions for common calculations and data processing.</p>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🔢</div>
+                                <div class="card-title">FC_CalculateAverage</div>
+                            </div>
+                            <p class="card-description">Calculate average value from an array of inputs with configurable sample size.</p>
+                            <button class="download-btn" data-file="FC_CalculateAverage.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🔄</div>
+                                <div class="card-title">FC_ConvertUnits</div>
+                            </div>
+                            <p class="card-description">Unit conversion function for various measurement types.</p>
+                            <button class="download-btn" data-file="FC_ConvertUnits.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Blocks Page -->
+                <div class="page" id="data-blocks-page">
+                    <h1 class="page-title">Data Blocks (DB)</h1>
+                    <p>Predefined data structures for efficient data management.</p>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🍪</div>
+                                <div class="card-title">DB_RecipeTemplate</div>
+                            </div>
+                            <p class="card-description">Template data block for recipe management with multiple parameter sets.</p>
+                            <button class="download-btn" data-file="DB_RecipeTemplate.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">📊</div>
+                                <div class="card-title">DB_DataLog</div>
+                            </div>
+                            <p class="card-description">Data logging structure with timestamp and value storage.</p>
+                            <button class="download-btn" data-file="DB_DataLog.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SCL Templates Page -->
+                <div class="page" id="scl-templates-page">
+                    <h1 class="page-title">SCL Templates</h1>
+                    <p>Ready-to-use SCL code templates for common programming patterns.</p>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">🔄</div>
+                                <div class="card-title">SCL_LoopTemplate</div>
+                            </div>
+                            <p class="card-description">Template for efficient loop structures with break conditions.</p>
+                            <button class="download-btn" data-file="SCL_LoopTemplate.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">⚡</div>
+                                <div class="card-title">SCL_StateMachine</div>
+                            </div>
+                            <p class="card-description">State machine implementation template with transition logic.</p>
+                            <button class="download-btn" data-file="SCL_StateMachine.scl"><i>📥</i> Download SCL File</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Page -->
+                <div class="page" id="about-page">
+                    <h1 class="page-title">About</h1>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">ℹ️</div>
+                            <div class="card-title">Siemens Standard Block Library</div>
+                        </div>
+                        <p class="card-description">
+                            This portal provides standardized Siemens TIA Portal blocks for industrial automation applications. 
+                            All blocks are designed following Siemens programming guidelines and best practices.
+                        </p>
+                        <p class="card-description">
+                            The library includes function blocks (FB), functions (FC), data blocks (DB), and SCL templates 
+                            for common automation tasks, helping engineers to accelerate project development while maintaining code quality.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Automators Industrial Projects Pvt. Ltd.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Loading Screen
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loading-screen').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loading-screen').style.display = 'none';
+                }, 500);
+            }, 3000);
+        });
+
+        // Create Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 3px and 8px
+                const size = Math.random() * 5 + 3;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation delay
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Ripple Effect
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+            circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+            circle.classList.add('ripple');
+            
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) {
+                ripple.remove();
+            }
+            
+            button.appendChild(circle);
+        }
+
+        // Login Functionality
+        document.getElementById('login-btn').addEventListener('click', function(event) {
+            createRipple(event);
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple frontend validation
+            if (email === 'test@admin.com' && password === '12345') {
+                // Fade out login page
+                document.getElementById('login-page').style.opacity = '0';
+                
+                setTimeout(function() {
+                    document.getElementById('login-page').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'flex';
+                    
+                    // Fade in dashboard
+                    setTimeout(function() {
+                        document.getElementById('dashboard').style.opacity = '1';
+                    }, 50);
+                }, 500);
+            } else {
+                alert('Invalid credentials. Use email: test@admin.com, password: 12345');
+            }
+        });
+
+        // Sidebar Navigation
+        const sidebarItems = document.querySelectorAll('.sidebar li');
+        const pages = document.querySelectorAll('.page');
+        
+        sidebarItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Hide all pages
+                pages.forEach(page => page.classList.remove('active'));
+                
+                // Show selected page
+                const pageId = this.getAttribute('data-page');
+                document.getElementById(pageId).classList.add('active');
+                
+                // Close sidebar on mobile after selection
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('active');
+                }
+            });
+        });
+
+        // Menu Toggle for Mobile
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Download Buttons
+        const downloadButtons = document.querySelectorAll('.download-btn');
+        
+        downloadButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                createRipple(event);
+                
+                // Check if it's a navigation button or download button
+                if (this.hasAttribute('data-page')) {
+                    const pageId = this.getAttribute('data-page');
+                    
+                    // Update sidebar active item
+                    sidebarItems.forEach(i => i.classList.remove('active'));
+                    document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+                    
+                    // Show selected page
+                    pages.forEach(page => page.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                } else {
+                    // It's a download button
+                    const fileName = this.getAttribute('data-file');
+                    
+                    // Create a dummy SCL file content
+                    const fileContent = `// ${fileName}\n// Siemens Standard Block\n// Generated from Siemens Standard Block Library\n\nFUNCTION_BLOCK ${fileName.replace('.scl', '')}\nVAR\n    // Add your variables here\nEND_VAR\n\n// Add your logic here\n\nEND_FUNCTION_BLOCK`;
+                    
+                    // Create a blob and download link
+                    const blob = new Blob([fileContent], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+            });
+        });
+
+        // Initialize particles on login page
+        createParticles();
+    </script>
+</body>
+</html>
